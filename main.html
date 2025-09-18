@@ -2,14 +2,493 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Premier League Stats 2024-25</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3b0764 0%, #5b21b6 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        .stats-table thead th {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 3px solid #3b82f6;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .stats-table thead th:first-child {
+            width: 60px;
+            text-align: center;
+        }
+
+        .stats-table thead th:nth-child(2) {
+            width: 250px;
+        }
+
+        .stats-table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .stats-table tbody tr:nth-child(odd) {
+            background-color: rgba(248, 250, 252, 0.8);
+        }
+
+        .stats-table tbody tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stats-table tbody tr:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+        }
+
+        .stats-table tbody td {
+            padding: 16px 15px;
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .stats-table tbody td:last-child {
+            border-right: none;
+        }
+
+        .position {
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1em;
+            color: #1e293b;
+        }
+
+        .team-name {
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .points {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .champions {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%) !important;
+            color: #92400e;
+            font-weight: bold;
+        }
+
+        .champions-league {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%) !important;
+        }
+
+        .europa-league {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(234, 88, 12, 0.15) 100%) !important;
+        }
+
+        .relegation {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%) !important;
+        }
+
+        .stats-number {
+            font-weight: 500;
+            color: #374151;
+            text-align: center;
+        }
+
+        .goal-diff {
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .goal-diff.positive {
+            color: #16a34a;
+        }
+
+        .goal-diff.negative {
+            color: #dc2626;
+        }
+
+        .legend {
+            padding: 20px;
+            background: rgba(248, 250, 252, 0.8);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .legend h3 {
+            margin-bottom: 12px;
+            color: #1e293b;
+            font-size: 1.1em;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+            color: #374151;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .legend-gold {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        }
+
+        .legend-green {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+        }
+
+        .legend-orange {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.3) 0%, rgba(234, 88, 12, 0.3) 100%);
+        }
+
+        .legend-red {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(220, 38, 38, 0.3) 100%);
+        }
+
+        @media (max-width: 768px) {
+            .stats-table {
+                font-size: 0.8em;
+            }
+            
+            .stats-table thead th,
+            .stats-table tbody td {
+                padding: 12px 8px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .legend-items {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- add table here -->
-
+    <div class="table-container">
+        <div class="header">
+            <h1>⚽ Premier League 2024-25</h1>
+            <p>Current Season Standings & Statistics</p>
+        </div>
         
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>Pos</th>
+                    <th>Team</th>
+                    <th>MP</th>
+                    <th>W</th>
+                    <th>D</th>
+                    <th>L</th>
+                    <th>GF</th>
+                    <th>GA</th>
+                    <th>GD</th>
+                    <th>Pts</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="champions">
+                    <td class="position">1</td>
+                    <td class="team-name">
+                        <div class="team-logo">MC</div>
+                        Manchester City
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">5</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">0</td>
+                    <td class="stats-number">14</td>
+                    <td class="stats-number">5</td>
+                    <td class="goal-diff positive">+9</td>
+                    <td class="points">16</td>
+                </tr>
+                <tr class="champions-league">
+                    <td class="position">2</td>
+                    <td class="team-name">
+                        <div class="team-logo">LIV</div>
+                        Liverpool
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">5</td>
+                    <td class="stats-number">0</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">12</td>
+                    <td class="stats-number">4</td>
+                    <td class="goal-diff positive">+8</td>
+                    <td class="points">15</td>
+                </tr>
+                <tr class="champions-league">
+                    <td class="position">3</td>
+                    <td class="team-name">
+                        <div class="team-logo">ARS</div>
+                        Arsenal
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">4</td>
+                    <td class="stats-number">2</td>
+                    <td class="stats-number">0</td>
+                    <td class="stats-number">12</td>
+                    <td class="stats-number">6</td>
+                    <td class="goal-diff positive">+6</td>
+                    <td class="points">14</td>
+                </tr>
+                <tr class="champions-league">
+                    <td class="position">4</td>
+                    <td class="team-name">
+                        <div class="team-logo">AVL</div>
+                        Aston Villa
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">4</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">12</td>
+                    <td class="stats-number">8</td>
+                    <td class="goal-diff positive">+4</td>
+                    <td class="points">13</td>
+                </tr>
+                <tr class="europa-league">
+                    <td class="position">5</td>
+                    <td class="team-name">
+                        <div class="team-logo">CHE</div>
+                        Chelsea
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">4</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">15</td>
+                    <td class="stats-number">8</td>
+                    <td class="goal-diff positive">+7</td>
+                    <td class="points">13</td>
+                </tr>
+                <tr class="europa-league">
+                    <td class="position">6</td>
+                    <td class="team-name">
+                        <div class="team-logo">NEW</div>
+                        Newcastle United
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">3</td>
+                    <td class="stats-number">2</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">11</td>
+                    <td class="stats-number">7</td>
+                    <td class="goal-diff positive">+4</td>
+                    <td class="points">11</td>
+                </tr>
+                <tr>
+                    <td class="position">7</td>
+                    <td class="team-name">
+                        <div class="team-logo">BHA</div>
+                        Brighton & Hove Albion
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">3</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">2</td>
+                    <td class="stats-number">11</td>
+                    <td class="stats-number">9</td>
+                    <td class="goal-diff positive">+2</td>
+                    <td class="points">10</td>
+                </tr>
+                <tr>
+                    <td class="position">8</td>
+                    <td class="team-name">
+                        <div class="team-logo">TOT</div>
+                        Tottenham Hotspur
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">3</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">2</td>
+                    <td class="stats-number">13</td>
+                    <td class="stats-number">7</td>
+                    <td class="goal-diff positive">+6</td>
+                    <td class="points">10</td>
+                </tr>
+                <tr>
+                    <td class="position">9</td>
+                    <td class="team-name">
+                        <div class="team-logo">MUN</div>
+                        Manchester United
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">3</td>
+                    <td class="stats-number">0</td>
+                    <td class="stats-number">3</td>
+                    <td class="stats-number">8</td>
+                    <td class="stats-number">8</td>
+                    <td class="goal-diff">0</td>
+                    <td class="points">9</td>
+                </tr>
+                <tr>
+                    <td class="position">10</td>
+                    <td class="team-name">
+                        <div class="team-logo">FUL</div>
+                        Fulham
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">2</td>
+                    <td class="stats-number">3</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">7</td>
+                    <td class="stats-number">5</td>
+                    <td class="goal-diff positive">+2</td>
+                    <td class="points">9</td>
+                </tr>
+                <tr class="relegation">
+                    <td class="position">18</td>
+                    <td class="team-name">
+                        <div class="team-logo">LEI</div>
+                        Leicester City
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">4</td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">13</td>
+                    <td class="goal-diff negative">-7</td>
+                    <td class="points">4</td>
+                </tr>
+                <tr class="relegation">
+                    <td class="position">19</td>
+                    <td class="team-name">
+                        <div class="team-logo">EVE</div>
+                        Everton
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">4</td>
+                    <td class="stats-number">5</td>
+                    <td class="stats-number">13</td>
+                    <td class="goal-diff negative">-8</td>
+                    <td class="points">4</td>
+                </tr>
+                <tr class="relegation">
+                    <td class="position">20</td>
+                    <td class="team-name">
+                        <div class="team-logo">SOU</div>
+                        Southampton
+                    </td>
+                    <td class="stats-number">6</td>
+                    <td class="stats-number">0</td>
+                    <td class="stats-number">1</td>
+                    <td class="stats-number">5</td>
+                    <td class="stats-number">3</td>
+                    <td class="stats-number">13</td>
+                    <td class="goal-diff negative">-10</td>
+                    <td class="points">1</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="legend">
+            <h3>League Qualification</h3>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color legend-gold"></div>
+                    <span>Champions</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-green"></div>
+                    <span>Champions League</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-orange"></div>
+                    <span>Europa League</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-red"></div>
+                    <span>Relegation Zone</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
